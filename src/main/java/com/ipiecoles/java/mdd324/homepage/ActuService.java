@@ -2,6 +2,7 @@ package com.ipiecoles.java.mdd324.homepage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -12,14 +13,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Service {
+@Service
+public class ActuService {
 
-    private final Logger logger = LoggerFactory.getLogger(Service.class);
+    private final Logger logger = LoggerFactory.getLogger(ActuService.class);
 
+    public List<Item> getActus() {
 
-    public Rss getActus() {
-
-        Rss rss = null;
+        List<Item> items = new ArrayList<>();
 
         try {
             String URL = "https://www.lemonde.fr/rss/une.xml";
@@ -28,27 +29,24 @@ public class Service {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(URL);
 
-            // normalize XML response
+            // Normalize XML response
             doc.getDocumentElement().normalize();
 
-            //read details first
-            rss = new Rss(new Channel(
+            // Read details first
+            Rss rss = new Rss(new Channel(
                     doc.getElementsByTagName("title").item(0).getTextContent(),
                     doc.getElementsByTagName("description").item(0).getTextContent(),
                     doc.getElementsByTagName("copyright").item(0).getTextContent(),
                     doc.getElementsByTagName("link").item(0).getTextContent(),
                     doc.getElementsByTagName("pubDate").item(0).getTextContent(),
-                    doc.getElementsByTagName("langage").item(0).getTextContent())
+                    doc.getElementsByTagName("language").item(0).getTextContent())
             );
 
-            //read students list
+            // Read items list
             NodeList nodeList = doc.getElementsByTagName("item");
 
-            //create an empty list for students
-            List<Item> items = new ArrayList<>();
-
-            //loop all available student nodes
-            for (int i = 0; i < nodeList.getLength(); i++) {
+            // Loop 10 last item nodes
+            for (int i = 0; i < 10; i++) {
 
                 Node node = nodeList.item(i);
 
@@ -69,6 +67,6 @@ public class Service {
             logger.error(ex.getMessage());
         }
 
-        return rss;
+        return items;
     }
 }
